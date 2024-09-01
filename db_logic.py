@@ -1,17 +1,21 @@
 #db_logic.py
-
 import json
 import psycopg2
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Function to connect to the PostgreSQL database
 def connect_to_db():
     conn = psycopg2.connect(
-        dbname="skill---2030",
-        user="postgres",
-        password="1234",
-        host="localhost",
-        port="5432"
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
     )
     return conn
 
