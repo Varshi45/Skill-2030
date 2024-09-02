@@ -5,7 +5,6 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
 load_dotenv()
 
 # Function to connect to the PostgreSQL database
@@ -89,7 +88,7 @@ def fetch_interview_data(conn):
     SELECT id, name, invitation, created_on, 
            num_candidates, end_time, start_time
     FROM interviews_assignmentpool
-    WHERE id = ANY(%s) AND num_candidates > 11;
+    WHERE id = ANY(%s) AND num_candidates > 9;
     """
     cur.execute(query, (pool_ids,))
     results = cur.fetchall()

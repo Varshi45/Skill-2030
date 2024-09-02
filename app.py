@@ -178,7 +178,7 @@ def render_performance_metrics(performance_data, pool_names):
         st.write("No performance data available.")
         return
     
-    st.write("Performance Metrics")
+    st.write(f"**Performance Metrics**")
 
     # Plot overall average score by pool
     fig_avg_score = px.bar(
