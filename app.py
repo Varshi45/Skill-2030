@@ -81,13 +81,14 @@ def plot_candidate_distribution(interview_df, categorized_students_df):
     ).drop(columns='ID')
 
     categorized_students_df = categorized_students_df.rename(columns={'Name': 'Pool Name'})
+
+    # Group by Pool Name and Category to get the total count for each pool and category
     pool_category_counts = categorized_students_df.groupby(['Pool Name', 'Category']).agg({'Count': 'sum'}).reset_index()
 
+    # Calculate total count for each pool to display on top of the bars
     total_pool_counts = pool_category_counts.groupby('Pool Name')['Count'].sum().reset_index()
 
-    pool_category_counts = pool_category_counts.merge(total_pool_counts, on='Pool Name', suffixes=('', '_Total'))
-
-    # Create a bar plot with the total count as a label on top of each bar
+    # Create a bar plot without displaying total count for each category
     fig_candidates = px.bar(
         pool_category_counts,
         x='Pool Name',
@@ -96,11 +97,25 @@ def plot_candidate_distribution(interview_df, categorized_students_df):
         title='Student Distribution by Category for Each Interview Pool',
         labels={'Pool Name': 'Interview Pool', 'Count': 'Number of Students', 'Category': 'Student Category'},
         height=500,
-        barmode='stack',
-        text='Count_Total'
+        barmode='stack'
     )
+
+    # Customize the hover information and text position
     fig_candidates.update_traces(textposition='outside')
 
+    # Add annotations for the total count of each pool, placed above the bars
+    for i, row in total_pool_counts.iterrows():
+        fig_candidates.add_annotation(
+            x=row['Pool Name'],
+            y=row['Count'],
+            text=f'Total: {row["Count"]}',
+            showarrow=False,
+            font=dict(size=12, color='black'),
+            xanchor='center',
+            yanchor='bottom'
+        )
+
+    # Display the plot
     st.plotly_chart(fig_candidates, use_container_width=True)
 
 
@@ -175,6 +190,19 @@ def render_performance_metrics(performance_data, pool_names):
         labels={'Pool Name': 'Interview Pool', 'Average Score': 'Average Score'},
         height=500
     )
+
+    # Add annotations for average score
+    for i, row in df.iterrows():
+        fig_avg_score.add_annotation(
+            x=row['Pool Name'],
+            y=row['Average Score'],
+            text=f'{row["Average Score"]:.2f}',
+            showarrow=False,
+            font=dict(size=12, color='black'),
+            xanchor='center',
+            yanchor='bottom'
+        )
+
     st.plotly_chart(fig_avg_score, use_container_width=True)
 
     # Plot number of students who failed by pool
@@ -187,6 +215,19 @@ def render_performance_metrics(performance_data, pool_names):
         labels={'Pool Name': 'Interview Pool', 'Number of Students Failed': 'Number of Students Failed'},
         height=500
     )
+
+    # Add annotations for students failed
+    for i, row in df.iterrows():
+        fig_failed.add_annotation(
+            x=row['Pool Name'],
+            y=row['Number of Students Failed'],
+            text=f'{row["Number of Students Failed"]}',
+            showarrow=False,
+            font=dict(size=12, color='black'),
+            xanchor='center',
+            yanchor='bottom'
+        )
+
     st.plotly_chart(fig_failed, use_container_width=True)
 
     # Plot number of students who haven't completed the interview by pool
@@ -199,33 +240,19 @@ def render_performance_metrics(performance_data, pool_names):
         labels={'Pool Name': 'Interview Pool', 'Number of Students Not Completed': 'Number of Students Not Completed'},
         height=500
     )
+
+    # Add annotations for students not completed
+    for i, row in df.iterrows():
+        fig_not_completed.add_annotation(
+            x=row['Pool Name'],
+            y=row['Number of Students Not Completed'],
+            text=f'{row["Number of Students Not Completed"]}',
+            showarrow=False,
+            font=dict(size=12, color='black'),
+            xanchor='center',
+            yanchor='bottom'
+        )
+
     st.plotly_chart(fig_not_completed, use_container_width=True)
-    # Render sub-category average scores if available
-    # if 'Sub-Category Averages' in df.columns and df['Sub-Category Averages'].apply(bool).any():
-    #     for sub_category in df['Sub-Category Averages'].iloc[0].keys():
-    #         sub_category_scores = []
-    #         for index, row in df.iterrows():
-    #             # Check if the sub-category's average score is greater than zero
-    #             if row['Sub-Category Averages'][sub_category]['Average Score'] > 0:
-    #                 sub_category_scores.append({
-    #                     'Pool Name': row['Pool Name'],
-    #                     'Sub-Category': sub_category,
-    #                     'Average Score': row['Sub-Category Averages'][sub_category]['Average Score']
-    #                 })
-            
-    #         # Only render the sub-category chart if there are scores greater than zero
-    #         if sub_category_scores:
-    #             sub_category_df = pd.DataFrame(sub_category_scores)
-                
-    #             fig_sub_category = px.bar(
-    #                 sub_category_df,
-    #                 x='Pool Name',
-    #                 y='Average Score',
-    #                 color='Pool Name',
-    #                 title=f'Average {sub_category.title()} Score by Interview Pool',
-    #                 labels={'Pool Name': 'Interview Pool', 'Average Score': f'{sub_category.title()} Average Score'},
-    #                 height=500
-    #             )
-    #             st.plotly_chart(fig_sub_category, use_container_width=True)
 
 

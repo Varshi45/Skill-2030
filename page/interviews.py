@@ -1,3 +1,5 @@
+#page/interview.py
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -34,8 +36,22 @@ def interviews_page():
         title='Branch Distribution for Each Assignment Pool',
         labels={'Category': 'Category', 'Count': 'Number of Students', 'Pool ID': 'Interview Pool'},
         height=500,
-        barmode='group'
+        barmode='group',
+        text='Count'  # Add text labels to bars
     )
+    
+    fig_students.update_traces(
+        texttemplate='%{text}',  # Show the count value
+        textposition='inside',   # Position the text inside the bars
+        insidetextanchor='middle'  # Center the text inside the bars
+    )
+
+    fig_students.update_layout(
+        xaxis_title='Category',
+        yaxis_title='Number of Students',
+        xaxis_tickangle=-45  # Rotate x-axis labels if needed
+    )
+
     st.plotly_chart(fig_students, use_container_width=True)
 
     # Prepare pool names mapping

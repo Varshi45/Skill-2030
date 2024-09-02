@@ -31,15 +31,33 @@ def render_sub_category_metrics(performance_data, pool_names):
             if sub_category_scores:
                 sub_category_df = pd.DataFrame(sub_category_scores)
 
+                # Use a unique color for each combination of Pool Name and Sub-Category
                 fig_sub_category = px.bar(
                     sub_category_df,
                     x='Pool Name',
                     y='Average Score',
-                    color='Pool Name',
+                    color='Pool Name',  # Differentiate by Pool Name for colors
+                    barmode='group',  # Group bars by sub-category
                     title=f'Average {sub_category.title()} Score by Interview Pool',
                     labels={'Pool Name': 'Interview Pool', 'Average Score': f'{sub_category.title()} Average Score'},
-                    height=500
+                    height=500,
+                    text='Average Score'
                 )
+
+                # Update the traces and layout
+                fig_sub_category.update_traces(
+                    texttemplate='%{text}',  # Show the average score value
+                    textposition='inside',   # Position the text inside the bars
+                    insidetextanchor='middle'  # Center the text inside the bars
+                )
+
+                fig_sub_category.update_layout(
+                    xaxis_title='Interview Pool',
+                    yaxis_title=f'{sub_category.title()} Average Score',
+                    xaxis_tickangle=-45,  # Rotate x-axis labels if needed
+                    showlegend=True  # Ensure the legend is visible
+                )
+
                 st.plotly_chart(fig_sub_category, use_container_width=True)
 
 def categorical_analysis_page():
