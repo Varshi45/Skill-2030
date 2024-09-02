@@ -81,9 +81,13 @@ def plot_candidate_distribution(interview_df, categorized_students_df):
     ).drop(columns='ID')
 
     categorized_students_df = categorized_students_df.rename(columns={'Name': 'Pool Name'})
-
     pool_category_counts = categorized_students_df.groupby(['Pool Name', 'Category']).agg({'Count': 'sum'}).reset_index()
 
+    total_pool_counts = pool_category_counts.groupby('Pool Name')['Count'].sum().reset_index()
+
+    pool_category_counts = pool_category_counts.merge(total_pool_counts, on='Pool Name', suffixes=('', '_Total'))
+
+    # Create a bar plot with the total count as a label on top of each bar
     fig_candidates = px.bar(
         pool_category_counts,
         x='Pool Name',
@@ -92,10 +96,13 @@ def plot_candidate_distribution(interview_df, categorized_students_df):
         title='Student Distribution by Category for Each Interview Pool',
         labels={'Pool Name': 'Interview Pool', 'Count': 'Number of Students', 'Category': 'Student Category'},
         height=500,
-        barmode='stack'
+        barmode='stack',
+        text='Count_Total'
     )
+    fig_candidates.update_traces(textposition='outside')
 
     st.plotly_chart(fig_candidates, use_container_width=True)
+
 
 def display_categorized_students(students_df, interview_df):
     pool_ids = interview_df['ID'].tolist()
